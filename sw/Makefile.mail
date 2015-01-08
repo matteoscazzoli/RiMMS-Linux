@@ -1,0 +1,32 @@
+#CC = gcc 
+CC = arm-linux-gnueabi-gcc 
+#CFLAGS = #-O2 -Wall -static -fpack-struct -I/usr/include -I./include -march=amdfam10 -mtune=amdfam10 -pthread  
+ROOTDIR=${PWD}
+CFLAGS=#"-I${ROOTDIR}/zlib/include -I${ROOTDIR}/mail"
+LDFLAGS="-L${ROOTDIR}/zlib/lib"
+DIRMAIL= mail/
+
+# uncomment the following line if compiling on a 64 bit machine 
+#BIT64 = -Dbit64
+
+TARGET = RiMMS.exe 
+MAILOBJ = $(DIRMAIL)smtp.o $(DIRMAIL)utils.o $(DIRMAIL)setget.o $(DIRMAIL)mime.o $(DIRMAIL)msock.o $(DIRMAIL)mutils.o $(DIRMAIL)string.o $(DIRMAIL)sll.o
+RIMMSOBJ = rimms.o protocolrimms.o
+FTPOBJ = ftpclient.o
+SYSTEMOBJ = main.o utility.o sm.o gpioFastLib.o display.o
+.PHONY: install 
+
+all:	$(TARGET) 
+
+$(TARGET):  $(SYSTEMOBJ) $(FTPOBJ) $(RIMMSOBJ) $(MAILOBJ)
+	$(CC)  $(SYSTEMOBJ) $(FTPOBJ) $(RIMMSOBJ) $(MAILOBJ) -o $(TARGET)-pthread $(LDFLAGS) -lz
+	
+.o:
+	$(CC) $(CFLAGS) -c ${ROOTDIR}*.c
+	cd $(DIRMAIL)
+	$(CC) $(CFLAGS) -c ${ROOTDIR}$(DIRMAIL)*.c
+
+clean:
+	rm -f $(TARGET) *.o $(DIRMAIL)*.o
+
+	

@@ -1,0 +1,61 @@
+#CC = gcc 
+CC = arm-linux-gnueabi-gcc 
+#CFLAGS = #-O2 -Wall -static -fpack-struct -I/usr/include -I./include -march=amdfam10 -mtune=amdfam10 -pthread  
+ROOTDIR=${PWD}
+CFLAGS=#"-I${ROOTDIR}/zlib/include"
+LDFLAGS="-L${ROOTDIR}/zlib/lib"
+
+# uncomment the following line if compiling on a 64 bit machine 
+#BIT64 = -Dbit64
+
+INSTALLSITEMAN1DIR = ${mandir}/man1 
+DISTMAN1DIR = docs/man 
+bindir = ${exec_prefix}/bin 
+datarootdir = ${prefix}/share 
+exec_prefix = ${prefix} 
+mandir = ${datarootdir}/man 
+prefix = /usr/local 
+
+TARGET = RiMMS.exe 
+
+.PHONY: install 
+
+all:	$(TARGET) 
+
+$(TARGET): main.o utility.o sm.o gpioFastLib.o rimms.o display.o protocolrimms.o ftpclient.o
+	$(CC) main.o utility.o sm.o gpioFastLib.o rimms.o display.o protocolrimms.o ftpclient.o -o $(TARGET)-pthread $(LDFLAGS) -lz
+	
+main.o: main.c main.h
+	$(CC) $(CFLAGS) ${BIT64} -c main.c 
+
+utility.o: utility.c utility.h
+	$(CC) $(CFLAGS) ${BIT64} -c utility.c 
+
+sm.o: sm.c sm.h
+	$(CC) $(CFLAGS) ${BIT64} -c sm.c 
+
+gpioFastLib.o: gpioFastLib.c
+	$(CC) $(CFLAGS) ${BIT64} -c gpioFastLib.c 
+
+rimms.o: rimms.c rimms.h
+	$(CC) $(CFLAGS) ${BIT64} -c rimms.c 
+
+display.o: display.c display.h
+	$(CC) $(CFLAGS) ${BIT64} -c display.c
+
+protocolrimms.o: protocolrimms.c protocolrimms.h
+	$(CC) $(CFLAGS) ${BIT64} -c protocolrimms.c
+	
+ftpclient.o: ftpclient.c ftpclient.h
+	$(CC) $(CFLAGS) ${BIT64} -c ftpclient.c
+	
+clean:
+	rm -f $(TARGET) *.o 
+
+install: cc.exe
+	install -m 0700 $(TARGET) $(bindir)
+	install -m 0644 ${DISTMAN1DIR}/$(TARGET).1 ${INSTALLSITEMAN1DIR} 
+
+uninstall:
+	rm -f $(bindir)/$(TARGET) ${INSTALLSITEMAN1DIR}/$(TARGET).1
+	
