@@ -1,7 +1,7 @@
 #ifndef MAIN_H 
 #define MAIN_H
 
-#define VER "0.4 RT 17/12/2014"
+#define VER "0.5 RT 17/12/2014"
 
 
 #define LOCK_FILE "RiMMS.lock"
